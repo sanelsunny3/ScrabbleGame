@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -69,6 +70,34 @@ namespace ScrabbleGame
             {
                 Console.WriteLine(player.word);
             }
+
+            Console.WriteLine();
+        }
+
+        public void LoadCombinations()
+        {
+            foreach (Player player in Players)
+            {
+                Console.WriteLine($"{player.word}");
+
+                for (int i = 0; i < player.word.Length; i++)
+                {
+                    for (int j = 0; j < player.word.Length; j++)
+                    {
+                        string combination = $"{player.word[i]}{player.word[j]}";
+
+                        if (Appendix.Contains(combination.ToLower()))
+                        {
+                            ScrabbleTile tile1 = Tiles.Find(x => x.Symbol == combination[0]);
+                            ScrabbleTile tile2 = Tiles.Find(x => x.Symbol == combination[1]);
+                            int faceValue = tile1.Points + tile2.Points;
+                            Console.Write(combination.ToLower() + " (" + faceValue + ") ");
+                        }
+                    }
+                }
+
+                Console.WriteLine("\n");
+            }
         }
 
         public void StartGame() 
@@ -79,6 +108,7 @@ namespace ScrabbleGame
 
             DrawTiles();
 
+            LoadCombinations();
 
         }
     }
