@@ -74,8 +74,63 @@ namespace ScrabbleGame
             Console.WriteLine();
         }
 
+        public void DrawTilesTest()
+        {
+            
+            Player player1 = new Player();
+            player1.word = "FPDTP??";                
+            Players.Add(player1);
+
+            Player player2 = new Player();
+            player2.word = "CJFLQWW";
+            Players.Add(player2);            
+
+            foreach (Player player in Players)
+            {
+                Console.WriteLine(player.word);
+            }
+
+            Console.WriteLine();
+        }
+
         public void LoadCombinations()
         {
+            foreach (Player player in Players)
+            {
+                Console.WriteLine($"{player.word}");
+
+                if (player.word.Contains("?"))
+                    player.word.Replace("?", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+                for (int i = 0; i < player.word.Length; i++)
+                {
+                    for (int j = 0; j < player.word.Length; j++)
+                    {
+                        if (i != j)
+                        {
+                            string combination = $"{player.word[i]}{player.word[j]}";
+
+                            if (Appendix.Contains(combination.ToLower()))
+                            {
+                                ScrabbleTile tile1 = Tiles.Find(x => x.Symbol == combination[0]);
+                                ScrabbleTile tile2 = Tiles.Find(x => x.Symbol == combination[1]);
+                                int faceValue = tile1.Points + tile2.Points;
+                                Console.Write(combination.ToLower() + " (" + faceValue + ") ");
+                            }
+                        }                        
+                    }
+                }
+
+                Console.WriteLine("\n");
+            }
+        }
+
+        /*
+        public List<String> LoadCombinations1(String word)
+        {
+            if (word.Contains('?'))
+                word.Replace("?", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
             foreach (Player player in Players)
             {
                 Console.WriteLine($"{player.word}");
@@ -99,6 +154,7 @@ namespace ScrabbleGame
                 Console.WriteLine("\n");
             }
         }
+        */
 
         public void StartGame() 
         {
@@ -106,7 +162,9 @@ namespace ScrabbleGame
 
             LoadConfigs();
 
-            DrawTiles();
+            //DrawTiles();
+
+            DrawTilesTest();
 
             LoadCombinations();
 
