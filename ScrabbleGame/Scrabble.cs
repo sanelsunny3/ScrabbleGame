@@ -12,13 +12,13 @@ namespace ScrabbleGame
 {
     internal class Scrabble
     {       
-        List<ScrabbleTile> Tiles {  get; set; }
+        List<ScrabbleTile> TileBag {  get; set; }
         List<String> Appendix {  get; set; }
         List<Player> Players { get; set; }
 
         public Scrabble()
         {
-            Tiles = new List<ScrabbleTile>();
+            TileBag = new List<ScrabbleTile>();
             Appendix = new List<string>();
             Players = new List<Player>();
         }
@@ -29,7 +29,7 @@ namespace ScrabbleGame
             string tilePath = Path.Combine(Environment.CurrentDirectory, @"..\..\InputFiles\", tileFileName);
             string tileJsonString = File.ReadAllText(tilePath);
 
-            Tiles = JsonConvert.DeserializeObject<List<ScrabbleTile>>(tileJsonString);
+            TileBag = JsonConvert.DeserializeObject<List<ScrabbleTile>>(tileJsonString);
 
             string appendixFileName = "Appendix.txt";
             string appendixPath = Path.Combine(Environment.CurrentDirectory, @"..\..\InputFiles\", appendixFileName);
@@ -51,24 +51,24 @@ namespace ScrabbleGame
 
                 for (int j = 0; j < NoOfTiles;)
                 {
-                    index = random.Next(Tiles.Count);
+                    index = random.Next(TileBag.Count);
 
-                    if (Tiles[index].Distributions > 0)
+                    if (TileBag[index].Distributions > 0)
                     {
-                        word += Tiles[index].Symbol;
-                        Tiles[index].Distributions--;
+                        word += TileBag[index].Symbol;
+                        TileBag[index].Distributions--;
                         j++;
                     }
                 }
 
-                player.word = word;
+                player.Word = word;
                 word = "";
                 Players.Add(player);
             }
 
             foreach (Player player in Players)
             {
-                Console.WriteLine(player.word);
+                Console.WriteLine(player.Word);
             }
 
             Console.WriteLine();
@@ -78,16 +78,17 @@ namespace ScrabbleGame
         {
             
             Player player1 = new Player();
-            player1.word = "FPDTP??";                
+
+            player1.Word = "FPDTP??";                
             Players.Add(player1);
 
             Player player2 = new Player();
-            player2.word = "CJFLQWW";
+            player2.Word = "CJFLQWW";
             Players.Add(player2);            
 
             foreach (Player player in Players)
             {
-                Console.WriteLine(player.word);
+                Console.WriteLine(player.Word);
             }
 
             Console.WriteLine();
@@ -97,77 +98,70 @@ namespace ScrabbleGame
         {
             foreach (Player player in Players)
             {
-                Console.WriteLine($"{player.word}");
+                //Console.WriteLine($"{player.Word}");
 
-                if (player.word.Contains("?"))
-                    player.word.Replace("?", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                if (player.Word.Contains("?"))
+                    player.Word.Replace("?", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
-                for (int i = 0; i < player.word.Length; i++)
+                for (int i = 0; i < player.Word.Length; i++)
                 {
-                    for (int j = 0; j < player.word.Length; j++)
+                    for (int j = 0; j < player.Word.Length; j++)
                     {
                         if (i != j)
                         {
-                            string combination = $"{player.word[i]}{player.word[j]}";
+                            Combination combination = new Combination();
+                            combination.Word = $"{player.Word[i]}{player.Word[j]}";
 
-                            if (Appendix.Contains(combination.ToLower()))
-                            {
-                                ScrabbleTile tile1 = Tiles.Find(x => x.Symbol == combination[0]);
-                                ScrabbleTile tile2 = Tiles.Find(x => x.Symbol == combination[1]);
-                                int faceValue = tile1.Points + tile2.Points;
-                                Console.Write(combination.ToLower() + " (" + faceValue + ") ");
+                            if (Appendix.Contains(combination.Word.ToLower()))
+                            {                               
+                                ScrabbleTile tile1 = TileBag.Find(x => x.Symbol == combination.Word[0]);
+                                ScrabbleTile tile2 = TileBag.Find(x => x.Symbol == combination.Word[1]);
+                                combination.Value = tile1.Points + tile2.Points;
+                                //Console.Write(combination.ToLower() + " (" + faceValue + ") ");
+
+                                player.Combinations.Add(combination);
                             }
-                        }                        
-                    }
-                }
-
-                Console.WriteLine("\n");
-            }
-        }
-
-        /*
-        public List<String> LoadCombinations1(String word)
-        {
-            if (word.Contains('?'))
-                word.Replace("?", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-
-            foreach (Player player in Players)
-            {
-                Console.WriteLine($"{player.word}");
-
-                for (int i = 0; i < player.word.Length; i++)
-                {
-                    for (int j = 0; j < player.word.Length; j++)
-                    {
-                        string combination = $"{player.word[i]}{player.word[j]}";
-
-                        if (Appendix.Contains(combination.ToLower()))
-                        {
-                            ScrabbleTile tile1 = Tiles.Find(x => x.Symbol == combination[0]);
-                            ScrabbleTile tile2 = Tiles.Find(x => x.Symbol == combination[1]);
-                            int faceValue = tile1.Points + tile2.Points;
-                            Console.Write(combination.ToLower() + " (" + faceValue + ") ");
                         }
                     }
                 }
 
-                Console.WriteLine("\n");
+                //Console.WriteLine("\n");
             }
         }
-        */
+
+        public void PrintResult() 
+        {
+            foreach (Player player in Players)
+            { 
+                Console.WriteLine(player.Word);
+
+                if(player.Combinations.Count > 0)
+                {
+                    foreach (Combination combination in player.Combinations)
+                    {
+                        Console.Write(combination.Word + " (" + combination.Value + ") ");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(0);
+                }
+                
+                Console.WriteLine();
+            }
+        }
 
         public void StartGame() 
         {
-            Console.WriteLine("Loading Game...\n");
-
             LoadConfigs();
 
-            //DrawTiles();
+            DrawTiles();
 
-            DrawTilesTest();
+            //DrawTilesTest();
 
             LoadCombinations();
 
+            PrintResult();
         }
     }
 }

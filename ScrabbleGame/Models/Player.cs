@@ -8,7 +8,12 @@ namespace ScrabbleGame.Models
 {
     internal class Player
     {
-        public String word  { get; set; }
-        public List<String> combinations { get; set; }
+        public String Word  { get; set; }
+        public List<Combination> Combinations { get; set; }
+
+        public Player() 
+        { 
+            Combinations = new List<Combination>();
+        }
     }
 }
