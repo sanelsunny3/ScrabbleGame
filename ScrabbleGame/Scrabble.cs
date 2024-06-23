@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using ScrabbleGame.Config;
 using ScrabbleGame.Models;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace ScrabbleGame
         List<ScrabbleTile> TileBag {  get; set; }
         List<String> Appendix {  get; set; }
         List<Player> Players { get; set; }
+        int PlayerCount { get; set; }
+        int DrawCount { get; set; }
 
         public Scrabble()
         {
@@ -25,31 +28,36 @@ namespace ScrabbleGame
 
         public void LoadConfigs()
         {
-            string tileFileName = "TilesConfig.json";
-            string tilePath = Path.Combine(Environment.CurrentDirectory, @"..\..\InputFiles\", tileFileName);
-            string tileJsonString = File.ReadAllText(tilePath);
+            try
+            {                
+                string tilePath = Path.Combine(Environment.CurrentDirectory, AppConfig.tileFilePath);
+                string tileJsonString = File.ReadAllText(tilePath);
 
-            TileBag = JsonConvert.DeserializeObject<List<ScrabbleTile>>(tileJsonString);
+                TileBag = JsonConvert.DeserializeObject<List<ScrabbleTile>>(tileJsonString);
 
-            string appendixFileName = "Appendix.txt";
-            string appendixPath = Path.Combine(Environment.CurrentDirectory, @"..\..\InputFiles\", appendixFileName);
-            Appendix = File.ReadAllLines(appendixPath).ToList();
+                string appendixPath = Path.Combine(Environment.CurrentDirectory, AppConfig.appendixFilePath);
+                Appendix = File.ReadAllLines(appendixPath).ToList();
+
+                PlayerCount = AppConfig.playerCount;
+                DrawCount = AppConfig.drawCount;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
-        public void DrawTiles()
-        {
-            int NoOfPlayers = 2;
-            int NoOfTiles = 7;
-            
+        public void DrawTiles(int playerCount = 2, int drawCount = 7)
+        {            
             Random random = new Random();
             int index = 0;
             String word = "";
 
-            for (int i = 0; i < NoOfPlayers; i++)
+            for (int i = 0; i < playerCount; i++)
             {
                 Player player = new Player();
 
-                for (int j = 0; j < NoOfTiles;)
+                for (int j = 0; j < drawCount;)
                 {
                     index = random.Next(TileBag.Count);
 
@@ -66,6 +74,8 @@ namespace ScrabbleGame
                 Players.Add(player);
             }
 
+            Console.WriteLine();
+
             foreach (Player player in Players)
             {
                 Console.WriteLine(player.Word);
@@ -75,10 +85,8 @@ namespace ScrabbleGame
         }
 
         public void DrawTilesTest()
-        {
-            
+        {            
             Player player1 = new Player();
-
             player1.Word = "FPDTP??";                
             Players.Add(player1);
 
@@ -98,8 +106,6 @@ namespace ScrabbleGame
         {
             foreach (Player player in Players)
             {
-                //Console.WriteLine($"{player.Word}");
-
                 if (player.Word.Contains("?"))
                     player.Word.Replace("?", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
@@ -117,51 +123,36 @@ namespace ScrabbleGame
                                 ScrabbleTile tile1 = TileBag.Find(x => x.Symbol == combination.Word[0]);
                                 ScrabbleTile tile2 = TileBag.Find(x => x.Symbol == combination.Word[1]);
                                 combination.Value = tile1.Points + tile2.Points;
-                                //Console.Write(combination.ToLower() + " (" + faceValue + ") ");
-
+                                
                                 player.Combinations.Add(combination);
                             }
                         }
                     }
                 }
-
-                //Console.WriteLine("\n");
-            }
-        }
-
-        public void PrintResult() 
-        {
-            foreach (Player player in Players)
-            { 
-                Console.WriteLine(player.Word);
-
-                if(player.Combinations.Count > 0)
-                {
-                    foreach (Combination combination in player.Combinations)
-                    {
-                        Console.Write(combination.Word + " (" + combination.Value + ") ");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine(0);
-                }
-                
-                Console.WriteLine();
             }
         }
 
         public void StartGame() 
         {
-            LoadConfigs();
+            try
+            {
+                LoadConfigs();
 
-            DrawTiles();
+                DrawTiles(PlayerCount, DrawCount);
 
-            //DrawTilesTest();
+                //DrawTilesTest();
 
-            LoadCombinations();
+                LoadCombinations();
 
-            PrintResult();
+                foreach (Player player in Players)
+                {
+                    player.PrintAll();
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }            
         }
     }
 }

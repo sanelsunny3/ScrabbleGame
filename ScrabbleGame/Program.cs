@@ -17,8 +17,15 @@ namespace ScrabbleGame
 
             if(flag.ToLower() != "n")
             {
-                Scrabble scrabble = new Scrabble();
-                scrabble.StartGame();
+                try
+                {
+                    Scrabble scrabble = new Scrabble();
+                    scrabble.StartGame();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
             }            
 
             Console.ReadLine();
