@@ -30,14 +30,17 @@ namespace ScrabbleGame
         {
             try
             {                
+                //Loads Tile details from input file
                 string tilePath = Path.Combine(Environment.CurrentDirectory, AppConfig.tileFilePath);
                 string tileJsonString = File.ReadAllText(tilePath);
 
                 TileBag = JsonConvert.DeserializeObject<List<ScrabbleTile>>(tileJsonString);
 
+                //Loads Appendix details from input file
                 string appendixPath = Path.Combine(Environment.CurrentDirectory, AppConfig.appendixFilePath);
                 Appendix = File.ReadAllLines(appendixPath).ToList();
 
+                //Initialize default count
                 PlayerCount = AppConfig.playerCount;
                 DrawCount = AppConfig.drawCount;
             }
@@ -51,8 +54,7 @@ namespace ScrabbleGame
         {            
             Random random = new Random();
             int index = 0;
-            String word = "";
-
+            
             for (int i = 0; i < playerCount; i++)
             {
                 Player player = new Player();
@@ -63,14 +65,12 @@ namespace ScrabbleGame
 
                     if (TileBag[index].Distributions > 0)
                     {
-                        word += TileBag[index].Symbol;
+                        player.Word += TileBag[index].Symbol;
                         TileBag[index].Distributions--;
                         j++;
                     }
                 }
-
-                player.Word = word;
-                word = "";
+                
                 Players.Add(player);
             }
 
@@ -87,11 +87,11 @@ namespace ScrabbleGame
         public void DrawTilesTest()
         {            
             Player player1 = new Player();
-            player1.Word = "FPDTP??";                
+            player1.Word = "OUKWDES";                
             Players.Add(player1);
 
             Player player2 = new Player();
-            player2.Word = "CJFLQWW";
+            player2.Word = "ZEROOHI";
             Players.Add(player2);            
 
             foreach (Player player in Players)
@@ -100,54 +100,26 @@ namespace ScrabbleGame
             }
 
             Console.WriteLine();
-        }
-
-        public void LoadCombinations()
-        {
-            foreach (Player player in Players)
-            {
-                if (player.Word.Contains("?"))
-                    player.Word.Replace("?", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-
-                for (int i = 0; i < player.Word.Length; i++)
-                {
-                    for (int j = 0; j < player.Word.Length; j++)
-                    {
-                        if (i != j)
-                        {
-                            Combination combination = new Combination();
-                            combination.Word = $"{player.Word[i]}{player.Word[j]}";
-
-                            if (Appendix.Contains(combination.Word.ToLower()))
-                            {                               
-                                ScrabbleTile tile1 = TileBag.Find(x => x.Symbol == combination.Word[0]);
-                                ScrabbleTile tile2 = TileBag.Find(x => x.Symbol == combination.Word[1]);
-                                combination.Value = tile1.Points + tile2.Points;
-                                
-                                player.Combinations.Add(combination);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        }        
 
         public void StartGame() 
         {
             try
             {
+                //Initialize settings and list of appendix and tile bag for the game
                 LoadConfigs();
 
-                DrawTiles(PlayerCount, DrawCount);
+                //Generates scrabble word for each player
+                DrawTiles();
 
+                //Test method that contains default scrabble word
                 //DrawTilesTest();
 
-                LoadCombinations();
+                //Generates valid word combinations for each player
+                Players.ForEach(player => player.Play(Appendix, TileBag));
 
-                foreach (Player player in Players)
-                {
-                    player.PrintAll();
-                }
+                //Print the combinations and score of each player
+                Players.ForEach(player => player.PrintAll());
             }
             catch (Exception e)
             {

@@ -10,25 +10,27 @@ namespace ScrabbleGame
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("...Welcome to Scrabble Board Game...");
-            Console.WriteLine("...Do you wish to play (y/n)...");
-
-            String flag = Console.ReadLine();
-
-            if(flag.ToLower() != "n")
-            {
-                try
+            Console.WriteLine("***Welcome to Scrabble Board Game***");            
+            
+            try
+            { 
+                String flag = String.Empty;
+                do
                 {
                     Scrabble scrabble = new Scrabble();
-                    scrabble.StartGame();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                }
-            }            
+                    scrabble.StartGame();                        
 
-            Console.ReadLine();
+                    Console.WriteLine("\n***Do you wish to play again (y/n)***");
+                    flag = Console.ReadLine();
+                }
+                while (flag.ToLower() != "n");
+
+                Console.WriteLine("***End Game***");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }                                    
         }
     }
 }
