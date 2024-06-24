@@ -87,11 +87,11 @@ namespace ScrabbleGame
         public void DrawTilesTest()
         {            
             Player player1 = new Player();
-            player1.Word = "OUKWDES";                
+            player1.Word = "?UKWDES";                
             Players.Add(player1);
 
             Player player2 = new Player();
-            player2.Word = "ZEROOHI";
+            player2.Word = "?EROOHI";
             Players.Add(player2);            
 
             foreach (Player player in Players)

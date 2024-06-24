@@ -23,7 +23,7 @@ namespace ScrabbleGame.Models
             int isExist = 0;
 
             if (temp.Contains("?"))
-                temp.Replace("?", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                temp = temp.Replace("?", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
             for (int i = 0; i < temp.Length; i++)
             {
